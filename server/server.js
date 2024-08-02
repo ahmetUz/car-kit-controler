@@ -1,37 +1,35 @@
-const express = require('express')
-const cors = require('cors')
-const serveStatic = require('serve-static')
-const cookieParser = require('cookie-parser');
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 
-const path = require('path')
-const app = express()
-const port = 3001
-const publicDirectoryPath = path.join(__dirname, 'uploads')
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-/* Client Routes */
-const clientRoutes = require('./routes/nesilRoutes/clientSpaceCreationRoutes')
-/* ------------ */
+const sockets = new Map();
 
-/* Car Routes */
-const CarRoutes = require('./routes/clientRoutes/clientAccessRoutes')
-/* ------------ */
+io.on('connection', (socket) => {
+	console.log('Un utilisateur est connecté');
 
-app.use(cookieParser())
-app.use(cors({
-	credentials: true,
-	origin: true
-}))
-app.use(express.json())
-app.use(serveStatic(publicDirectoryPath))
+	socket.emit('identify', 'Veuillez vous identifier: client ou voiture?');
 
-/* Client Routes */
-app.use(clientRoutes)
-/* ------------ */
+	socket.on('identify', (role) => {
+		if (role === 'client') {
+			console.log('Un client est identifié');
+			sockets.set('client', socket);
+		} else if (role === 'voiture') {
+			console.log('Une voiture est identifiée');
+			sockets.set('voiture', socket);
+		} else {
+			socket.emit('error', 'Identification invalide');
+		}
+	});
 
-/* Car Routes */
-app.use(CarRoutes)
-/* ------------ */
+	socket.on('disconnect', () => {
+		console.log('Un utilisateur s\'est déconnecté');
+	});
+});
 
-app.listen(process.env.PORT || port, () => {
-	console.log(`Server is running on port ${port}`)
-})
+server.listen(3000, () => {
+	console.log('Serveur en écoute sur http://localhost:3000');
+});
