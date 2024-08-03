@@ -1,12 +1,13 @@
 import { io } from 'socket.io-client'
 import { useEffect, useState } from 'react'
 import CameraViewer from "./components/CameraViewer";
+import CarController from "./components/CarController";
 
 const App = () => {
 	const [socket, setSocket] = useState(null);
 
 	useEffect(() => {
-		const sockectInstance = io('http://localhost:8080');
+		const sockectInstance = io('http://localhost:3000');
 		setSocket(sockectInstance);
 		return () => {
 			(sockectInstance.disconnect);
@@ -28,7 +29,8 @@ const App = () => {
 
 	return (
 		<>
-			<CameraViewer />
+			{socket && <CameraViewer socket={socket} /> }
+			{socket && <CarController socket={socket} />}
 		</>
 	);
 }
