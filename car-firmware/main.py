@@ -1,12 +1,17 @@
-import socketio
-from lib.Motor import Motor
 from picamera2 import Picamera2
+from lib.Motor import Motor
+from lib.Led import Led
+from lib.Servo import Servo
+from rpi_ws281x import *
+import socketio
 import time
 import io
 
 socket = socketio.Client()
-motor = Motor()
 picam2 = Picamera2()
+motor = Motor()
+servo = Servo()
+led=Led()
 
 def stream_camera():
 	while True:
@@ -36,8 +41,27 @@ def on_move(direction):
 		motor.right()
 	else:
 		motor.stop()
-		
 
-socket.connect('http://')
+@socket.on('move_camera')
+def on_move_camera(direction):
+	if (direction == 'up'):
+		servo.up()
+	elif (direction == 'down'):
+		servo.down()
+	elif (direction == 'right'):
+		servo.right()
+	elif (direction == 'left'):
+		servo.left()
+
+@socket.on('led')
+def on_led(status):
+	print(status)
+	if (status == 'on'):
+		led.colorWipe(led.strip, Color(255,0, 0))
+	else:
+		led.colorWipe(led.strip, Color(0,0, 0))
+
+
+socket.connect('http://192.168.1.222:3000')
 
 socket.wait()

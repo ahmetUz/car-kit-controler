@@ -1,6 +1,6 @@
 import math
-from PCA9685 import PCA9685
-from ADC import *
+from lib.PCA9685 import PCA9685
+from lib.ADC import *
 import time
 
 class Motor:
@@ -8,7 +8,7 @@ class Motor:
 		self.pwm = PCA9685(0x40, debug=True)
 		self.pwm.setPWMFreq(50)
 		self.time_propotion = 2.5
-		self.adc = ADC()
+		self.adc = Adc()
 	
 	@staticmethod
 	def duty_range(duty1, duty2, duty3, duty4):
@@ -103,17 +103,17 @@ class Motor:
 			time.sleep(5 * self.time_proportion * bat_compensate / 1000)
 			angle -= 5
 	
-	def Forward(self):
+	def forward(self):
 		self.setMotorModel(2000, 2000, 2000, 2000)
 	
-	def Backward(self):
+	def backward(self):
 		self.setMotorModel(-2000, -2000, -2000, -2000)
 	
-	def TurnLeft(self):
+	def left(self):
 		self.setMotorModel(-500, -500, 2000, 2000)
 
-	def TurnRight(self):
+	def right(self):
 		self.setMotorModel(2000, 2000, -500, -500)
 	
-	def Stop(self):
+	def stop(self):
 		self.setMotorModel(0, 0, 0, 0)

@@ -1,5 +1,6 @@
 import smbus
 import time
+
 class Adc:
 	def __init__(self):
 		# Get I2C bus
